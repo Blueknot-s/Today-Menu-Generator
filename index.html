@@ -8,22 +8,25 @@
     body { font-family: 'Arial', sans-serif; background: #fdfdfd; padding: 20px; }
     h1 { text-align: center; }
     .container { max-width: 600px; margin: auto; }
-    input[type="text"], select { width: 80%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; display: inline-block; }
-    #addBtn { width: 18%; padding: 10px; margin-left: 2%; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    button { width: 100%; padding: 12px; background-color: #f97316; color: white; border: none; border-radius: 8px; font-size: 16px; box-shadow: 0 4px #d65a00; cursor: pointer; }
+    input[type="text"], select, #ingredientList, #result { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+    #addBtn { width: 48%; padding: 10px; margin-top: 8px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    #resetBtn { width: 48%; padding: 10px; margin-top: 8px; background-color: #e53e3e; color: white; border: none; border-radius: 6px; cursor: pointer; float: right; }
+    button { width: 100%; padding: 12px; background-color: #f97316; color: white; border: none; border-radius: 8px; font-size: 16px; box-shadow: 0 4px #d65a00; cursor: pointer; margin-top: 10px; }
     button:active { transform: translateY(2px); box-shadow: 0 2px #b94700; }
-    .result-card { margin-top: 20px; background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .result-card { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .tags { color: #888; margin-top: 5px; }
     .actions { display: flex; justify-content: space-between; margin-top: 10px; }
-    .actions button { width: 30%; padding: 8px; background: #eee; color: #333; box-shadow: none; border-radius: 6px; }
-    #ingredientList { margin: 10px 0; padding: 8px; background: #f1f1f1; border-radius: 6px; }
+    .actions button { width: 48%; padding: 8px; background: #eee; color: #333; box-shadow: none; border-radius: 6px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>오늘 뭐 먹지?</h1>
     <input type="text" id="ingredientInput" placeholder="예: 돼지고기">
-    <button id="addBtn" onclick="addIngredient()">추가</button>
+    <div style="display: flex; justify-content: space-between; gap: 4%;">
+      <button id="addBtn" onclick="addIngredient()">재료 추가</button>
+      <button id="resetBtn" onclick="resetIngredients()">입력 초기화</button>
+    </div>
     <div id="ingredientList"></div>
 
     <select id="mealType">
@@ -46,39 +49,16 @@
 
   <script>
     let ingredients = [];
+    let recipeDB = [];
 
-    let recipeDB = [
-      {
-        "menu": "된장찌개",
-        "ingredients": ["된장", "두부", "애호박", "양파", "표고버섯", "물"],
-        "method": "끓이기",
-        "kcal": 320
-      },
-      {
-        "menu": "계란찜",
-        "ingredients": ["계란", "물", "소금", "쪽파"],
-        "method": "찌기",
-        "kcal": 180
-      },
-      {
-        "menu": "김치볶음밥",
-        "ingredients": ["밥", "김치", "햄", "간장", "식용유"],
-        "method": "볶기",
-        "kcal": 700
-      },
-      {
-        "menu": "닭볶음탕",
-        "ingredients": ["닭고기", "감자", "양파", "당근", "고추장", "간장"],
-        "method": "끓이기",
-        "kcal": 850
-      },
-      {
-        "menu": "비빔국수",
-        "ingredients": ["소면", "고추장", "식초", "설탕", "참기름"],
-        "method": "무침",
-        "kcal": 550
+    async function loadRecipes() {
+      try {
+        const res = await fetch("/public_recipes_2000.json");
+        recipeDB = await res.json();
+      } catch (e) {
+        alert("레시피 데이터를 불러오는 데 실패했습니다.");
       }
-    ];
+    }
 
     function addIngredient() {
       const input = document.getElementById('ingredientInput');
@@ -88,6 +68,11 @@
         renderIngredients();
       }
       input.value = '';
+    }
+
+    function resetIngredients() {
+      ingredients = [];
+      document.getElementById('ingredientList').innerText = '';
     }
 
     function renderIngredients() {
@@ -142,6 +127,8 @@
       localStorage.setItem(`menu_${date}`, text);
       alert("오늘 식단이 저장되었습니다.");
     }
+
+    loadRecipes();
   </script>
 </body>
 </html>
