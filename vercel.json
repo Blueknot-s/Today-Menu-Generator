@@ -6,7 +6,10 @@
       "destination": "/index.html"
     }
   ],
-  "redirects": [],
-  "headers": [],
-  "trailingSlash": false
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ]
 }
